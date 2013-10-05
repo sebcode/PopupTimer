@@ -2,6 +2,8 @@
 #import "BackgroundView.h"
 #import "StatusItemView.h"
 #import "MenubarController.h"
+#import "ApplicationDelegate.h"
+#import <DDLog.h>
 
 #define OPEN_DURATION .15
 #define CLOSE_DURATION .1
@@ -18,8 +20,8 @@
 
 @synthesize backgroundView = _backgroundView;
 @synthesize delegate = _delegate;
-@synthesize searchField = _searchField;
-@synthesize textField = _textField;
+
+static const int ddLogLevel = LOG_LEVEL_INFO;
 
 #pragma mark -
 
@@ -29,13 +31,10 @@
     if (self != nil)
     {
         _delegate = delegate;
+        
+        [self restoreTime];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSControlTextDidChangeNotification object:self.searchField];
 }
 
 #pragma mark -
@@ -56,8 +55,7 @@
     panelRect.size.height = POPUP_HEIGHT;
     [[self window] setFrame:panelRect display:NO];
     
-    // Follow search string
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(runSearch) name:NSControlTextDidChangeNotification object:self.searchField];
+    [self updateLabel];
 }
 
 #pragma mark - Public accessors
@@ -108,38 +106,7 @@
     CGFloat statusX = roundf(NSMidX(statusRect));
     CGFloat panelX = statusX - NSMinX(panelRect);
     
-    self.backgroundView.arrowX = panelX;
-    
-    NSRect searchRect = [self.searchField frame];
-    searchRect.size.width = NSWidth([self.backgroundView bounds]) - SEARCH_INSET * 2;
-    searchRect.origin.x = SEARCH_INSET;
-    searchRect.origin.y = NSHeight([self.backgroundView bounds]) - ARROW_HEIGHT - SEARCH_INSET - NSHeight(searchRect);
-    
-    if (NSIsEmptyRect(searchRect))
-    {
-        [self.searchField setHidden:YES];
-    }
-    else
-    {
-        [self.searchField setFrame:searchRect];
-        [self.searchField setHidden:NO];
-    }
-    
-    NSRect textRect = [self.textField frame];
-    textRect.size.width = NSWidth([self.backgroundView bounds]) - SEARCH_INSET * 2;
-    textRect.origin.x = SEARCH_INSET;
-    textRect.size.height = NSHeight([self.backgroundView bounds]) - ARROW_HEIGHT - SEARCH_INSET * 3 - NSHeight(searchRect);
-    textRect.origin.y = SEARCH_INSET;
-    
-    if (NSIsEmptyRect(textRect))
-    {
-        [self.textField setHidden:YES];
-    }
-    else
-    {
-        [self.textField setFrame:textRect];
-        [self.textField setHidden:NO];
-    }
+    self.backgroundView.arrowX = panelX;    
 }
 
 #pragma mark - Keyboard
@@ -147,18 +114,6 @@
 - (void)cancelOperation:(id)sender
 {
     self.hasActivePanel = NO;
-}
-
-- (void)runSearch
-{
-    NSString *searchFormat = @"";
-    NSString *searchString = [self.searchField stringValue];
-    if ([searchString length] > 0)
-    {
-        searchFormat = NSLocalizedString(@"Search for ‘%@’…", @"Format for search request");
-    }
-    NSString *searchRequest = [NSString stringWithFormat:searchFormat, searchString];
-    [self.textField setStringValue:searchRequest];
 }
 
 #pragma mark - Public methods
@@ -218,7 +173,7 @@
         BOOL shiftOptionPressed = (clearFlags == (NSShiftKeyMask | NSAlternateKeyMask));
         if (shiftPressed || shiftOptionPressed)
         {
-            openDuration *= 10;
+            openDuration *= 100;
             
             if (shiftOptionPressed)
                 NSLog(@"Icon is at %@\n\tMenu is on screen %@\n\tWill be animated to %@",
@@ -226,26 +181,97 @@
         }
     }
     
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:openDuration];
-    [[panel animator] setFrame:panelRect display:YES];
-    [[panel animator] setAlphaValue:1];
-    [NSAnimationContext endGrouping];
-    
-    [panel performSelector:@selector(makeFirstResponder:) withObject:self.searchField afterDelay:openDuration];
+    [panel setFrame:panelRect display:YES];
+    [panel setAlphaValue:1];
 }
 
 - (void)closePanel
 {
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:CLOSE_DURATION];
-    [[[self window] animator] setAlphaValue:0];
-    [NSAnimationContext endGrouping];
+    [self.window orderOut:nil];
+}
+
+- (IBAction)pressReset:(id)sender
+{
+    if (timerStarted) {
+        [self pressStart:nil];
+    }
     
-    dispatch_after(dispatch_walltime(NULL, NSEC_PER_SEC * CLOSE_DURATION * 2), dispatch_get_main_queue(), ^{
-        
-        [self.window orderOut:nil];
-    });
+    DDLogInfo(@"Timer reset");
+    seconds = 0;
+    [self saveTime:YES];
+    [self updateLabel];
+}
+
+- (IBAction)pressQuit:(id)sender
+{
+    [self saveTime:YES];
+    [[NSApplication sharedApplication] terminate:nil];
+}
+
+- (IBAction)pressStart:(id)sender
+{
+    ApplicationDelegate *appDelegate = (ApplicationDelegate *)[[NSApplication sharedApplication] delegate];
+    
+    timerStarted = ! timerStarted;
+    
+    NSString *imgName = [NSString stringWithFormat:@"Status%@", timerStarted ? @"2" : @""];
+    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:imgName]];
+    
+    [startButton setTitle:timerStarted ? @"Stop" : @"Start"];
+    
+    if (!timer) {
+        timer = [NSTimer scheduledTimerWithTimeInterval: 1
+                                                 target: self
+                                               selector:@selector(tick)
+                                               userInfo: nil
+                                                repeats: YES];
+    }
+    
+    if (timerStarted) {
+        DDLogInfo(@"Timer start at %@", [self formatTime]);
+    } else {
+        DDLogInfo(@"Timer stop at %@", [self formatTime]);
+    }
+}
+
+- (NSString *)formatTime
+{
+    long h = seconds / 3600;
+    long m = (seconds / 60) % 60;
+    long s = seconds % 60;
+    return [NSString stringWithFormat:@"%02d:%02d:%02d", (int)h, (int)m, (int)s];
+}
+
+- (void)updateLabel
+{
+    timerLabel.stringValue = [self formatTime];
+}
+
+- (void)restoreTime
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    seconds = [ud integerForKey:@"timer"];
+    [self updateLabel];
+}
+
+- (void)saveTime:(BOOL)aDoSync
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setInteger:seconds forKey:@"timer"];
+    if (seconds % 60 == 0) {
+        [ud synchronize];
+    }
+}
+
+- (void)tick
+{
+    if (!timerStarted) {
+        return;
+    }
+    
+    seconds++;
+    [self updateLabel];
+    [self saveTime:seconds % 60 == 0];
 }
 
 @end

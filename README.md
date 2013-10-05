@@ -1,7 +1,5 @@
-# Popup
 
-Popup project is a demo with custom popover window appearing from the icon in the Mac OS X status bar.
+Status Bar Timer Application based on https://github.com/shpakovski/Popup
 
-# License
+Really just a dirrrty hack.
 
-Popup is licensed under the BSD license.

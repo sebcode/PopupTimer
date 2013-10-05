@@ -15,6 +15,13 @@
 
 @interface PanelController : NSWindowController <NSWindowDelegate>
 {
+    BOOL timerStarted;
+    long seconds;
+    NSTimer *timer;
+    
+    IBOutlet NSButton *startButton;
+    IBOutlet NSTextField *timerLabel;
+
     BOOL _hasActivePanel;
     __unsafe_unretained BackgroundView *_backgroundView;
     __unsafe_unretained id<PanelControllerDelegate> _delegate;
@@ -23,8 +30,6 @@
 }
 
 @property (nonatomic, unsafe_unretained) IBOutlet BackgroundView *backgroundView;
-@property (nonatomic, unsafe_unretained) IBOutlet NSSearchField *searchField;
-@property (nonatomic, unsafe_unretained) IBOutlet NSTextField *textField;
 
 @property (nonatomic) BOOL hasActivePanel;
 @property (nonatomic, unsafe_unretained, readonly) id<PanelControllerDelegate> delegate;
@@ -33,5 +38,9 @@
 
 - (void)openPanel;
 - (void)closePanel;
+
+- (IBAction)pressQuit:(id)sender;
+- (IBAction)pressReset:(id)sender;
+- (IBAction)pressStart:(id)sender;
 
 @end

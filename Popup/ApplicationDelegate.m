@@ -1,9 +1,13 @@
 #import "ApplicationDelegate.h"
+#import <DDLog.h>
+#import <DDFileLogger.h>
 
 @implementation ApplicationDelegate
 
 @synthesize panelController = _panelController;
 @synthesize menubarController = _menubarController;
+
+static const int ddLogLevel = LOG_LEVEL_INFO;
 
 #pragma mark -
 
@@ -30,12 +34,21 @@ void *kContextActivePanel = &kContextActivePanel;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    fileLogger = [[DDFileLogger alloc] init];
+    fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
+    fileLogger.logFileManager.maximumNumberOfLogFiles = 7;
+    [DDLog addLogger:fileLogger];
+    
+    DDLogInfo(@"App startup");
+
     // Install icon into the menu bar
     self.menubarController = [[MenubarController alloc] init];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+    DDLogInfo(@"App quit");
+    
     // Explicitly remove the icon from the menu bar
     self.menubarController = nil;
     return NSTerminateNow;
