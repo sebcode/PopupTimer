@@ -35,18 +35,19 @@ void *kContextActivePanel = &kContextActivePanel;
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     fileLogger = [[DDFileLogger alloc] init];
-    fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
-    fileLogger.logFileManager.maximumNumberOfLogFiles = 7;
+    fileLogger.rollingFrequency = 60 * 60 * 24 * 30; // once per month
+    fileLogger.logFileManager.maximumNumberOfLogFiles = 100;
     [DDLog addLogger:fileLogger];
     
     DDLogInfo(@"App startup");
-
+    
     // Install icon into the menu bar
     self.menubarController = [[MenubarController alloc] init];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+    [self.panelController onAppQuit];
     DDLogInfo(@"App quit");
     
     // Explicitly remove the icon from the menu bar

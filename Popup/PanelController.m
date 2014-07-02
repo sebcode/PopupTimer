@@ -28,10 +28,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (id)initWithDelegate:(id<PanelControllerDelegate>)delegate
 {
     self = [super initWithWindowNibName:@"Panel"];
-    if (self != nil)
-    {
+    if (self != nil) {
         _delegate = delegate;
-        
         [self restoreTime];
     }
     return self;
@@ -42,20 +40,53 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+
+    appDelegate = (ApplicationDelegate *)[[NSApplication sharedApplication] delegate];
+    userDefaults = [NSUserDefaults standardUserDefaults];
+
+    timer = [NSTimer scheduledTimerWithTimeInterval: 1
+                                             target: self
+                                           selector:@selector(tick)
+                                           userInfo: nil
+                                            repeats: YES];
+
+    timerLabel.textColor = [NSColor grayColor];
     
-    // Make a fully skinned panel
     NSPanel *panel = (id)[self window];
     [panel setAcceptsMouseMovedEvents:YES];
     [panel setLevel:NSPopUpMenuWindowLevel];
     [panel setOpaque:NO];
     [panel setBackgroundColor:[NSColor clearColor]];
     
-    // Resize panel
     NSRect panelRect = [[self window] frame];
-    panelRect.size.height = POPUP_HEIGHT;
     [[self window] setFrame:panelRect display:NO];
     
     [self updateLabel];
+
+    NSError *err = nil;
+    NSString *filepath = [@"~/.timerprojects" stringByExpandingTildeInPath];
+    NSString *file = [NSString stringWithContentsOfFile:filepath
+                                               encoding:NSUTF8StringEncoding
+                                                  error:&err];
+    if (file) {
+        NSArray *titles = [file componentsSeparatedByString:@"\n"];
+        titles = [titles filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"length > 0"]];
+        [popupButton addItemsWithTitles:titles];
+    }
+    
+    popupButton.menu.delegate = self;
+    
+    [popupButton setAction:@selector(changeProject:)];
+    
+    NSString *name = [userDefaults objectForKey:@"selected"];
+    for (NSMenuItem *item in popupButton.menu.itemArray) {
+        if ([item.title isEqualToString:name]) {
+            [popupButton selectItem:item];
+            break;
+        }
+    }
+    
+    [self switchProject];
 }
 
 #pragma mark - Public accessors
@@ -151,7 +182,6 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     NSRect statusRect = [self statusRectForWindow:panel];
 
     NSRect panelRect = [panel frame];
-    panelRect.size.width = PANEL_WIDTH;
     panelRect.origin.x = roundf(NSMidX(statusRect) - NSWidth(panelRect) / 2);
     panelRect.origin.y = NSMaxY(statusRect) - NSHeight(panelRect);
     
@@ -185,6 +215,34 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
     [panel setAlphaValue:1];
 }
 
+- (void)changeProject:(id)sender
+{
+    [self switchProject];
+}
+
+- (void)switchProject
+{
+    if (timerStarted) {
+        [self stopTimer];
+    }
+
+    [self saveTime:YES];
+
+    currentProject = popupButton.selectedItem.title;
+    [userDefaults setObject:currentProject forKey:@"selected"];
+    [userDefaults synchronize];
+    
+    [self restoreTime];
+    DDLogInfo(@"Set project: %@ at %@", currentProject, [self formatTime]);
+}
+
+- (void)onAppQuit
+{
+    if (timerStarted) {
+        [self stopTimer];
+    }
+}
+
 - (void)closePanel
 {
     [self.window orderOut:nil];
@@ -196,7 +254,7 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
         [self pressStart:nil];
     }
     
-    DDLogInfo(@"Timer reset");
+    DDLogInfo(@"[%@] Timer reset at %@", currentProject, [self formatTime]);
     seconds = 0;
     [self saveTime:YES];
     [self updateLabel];
@@ -210,28 +268,31 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (IBAction)pressStart:(id)sender
 {
-    ApplicationDelegate *appDelegate = (ApplicationDelegate *)[[NSApplication sharedApplication] delegate];
-    
     timerStarted = ! timerStarted;
     
-    NSString *imgName = [NSString stringWithFormat:@"Status%@", timerStarted ? @"2" : @""];
-    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:imgName]];
-    
-    [startButton setTitle:timerStarted ? @"Stop" : @"Start"];
-    
-    if (!timer) {
-        timer = [NSTimer scheduledTimerWithTimeInterval: 1
-                                                 target: self
-                                               selector:@selector(tick)
-                                               userInfo: nil
-                                                repeats: YES];
-    }
-    
     if (timerStarted) {
-        DDLogInfo(@"Timer start at %@", [self formatTime]);
+        [self startTimer];
     } else {
-        DDLogInfo(@"Timer stop at %@", [self formatTime]);
+        [self stopTimer];
     }
+}
+
+- (void)startTimer
+{
+    timerLabel.textColor = [NSColor blackColor];
+    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:@"Status2"]];
+    [startButton setTitle:@"Stop"];
+    DDLogInfo(@"[%@] Timer start at %@", currentProject, [self formatTime]);
+    timerStarted = YES;
+}
+
+- (void)stopTimer
+{
+    timerLabel.textColor = [NSColor grayColor];
+    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:@"Status"]];
+    [startButton setTitle:@"Start"];
+    DDLogInfo(@"[%@] Timer stop at %@", currentProject, [self formatTime]);
+    timerStarted = NO;
 }
 
 - (NSString *)formatTime
@@ -249,17 +310,17 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 
 - (void)restoreTime
 {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    seconds = [ud integerForKey:@"timer"];
+    NSString *key = [NSString stringWithFormat:@"timer_%@", currentProject];
+    seconds = [userDefaults integerForKey:key];
     [self updateLabel];
 }
 
 - (void)saveTime:(BOOL)aDoSync
 {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setInteger:seconds forKey:@"timer"];
-    if (seconds % 60 == 0) {
-        [ud synchronize];
+    NSString *key = [NSString stringWithFormat:@"timer_%@", currentProject];
+    [userDefaults setInteger:seconds forKey:key];
+    if (aDoSync || seconds % 60 == 0) {
+        [userDefaults synchronize];
     }
 }
 
