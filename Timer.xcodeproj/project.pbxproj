@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		96EE05A91739142200844F9B /* Status2.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EE05A71739142200844F9B /* Status2.png */; };
-		96EE05AA1739142200844F9B /* Status2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EE05A81739142200844F9B /* Status2@2x.png */; };
+		9608CC1E1ADC162700AB4ACB /* StatusOff@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9608CC1C1ADC162700AB4ACB /* StatusOff@2x.png */; };
+		9608CC1F1ADC162700AB4ACB /* StatusOn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9608CC1D1ADC162700AB4ACB /* StatusOn@2x.png */; };
 		C4AD91B1E5D0436DAB88D146 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 995A4E4D631A43CC9C828C3A /* libPods.a */; };
 		DD4F7C0913C30F9F00825C6E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD4F7C0813C30F9F00825C6E /* Cocoa.framework */; };
 		DD4F7C1513C30F9F00825C6E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD4F7C1413C30F9F00825C6E /* main.m */; };
@@ -20,13 +20,11 @@
 		DD4F7C4113C31B4A00825C6E /* Panel.xib in Resources */ = {isa = PBXBuildFile; fileRef = DD4F7C4013C31B4A00825C6E /* Panel.xib */; };
 		DD4F7C4413C31BD200825C6E /* Panel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD4F7C4313C31BD200825C6E /* Panel.m */; };
 		DD4F7C4713C3208500825C6E /* BackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD4F7C4613C3208500825C6E /* BackgroundView.m */; };
-		DD4F7C4B13C322FA00825C6E /* Status.png in Resources */ = {isa = PBXBuildFile; fileRef = DD4F7C4913C322FA00825C6E /* Status.png */; };
-		DDF4EFAC16C80A510044D141 /* Status@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DDF4EFAB16C80A510044D141 /* Status@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		96EE05A71739142200844F9B /* Status2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Status2.png; path = Popup/Status2.png; sourceTree = "<group>"; };
-		96EE05A81739142200844F9B /* Status2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Status2@2x.png"; path = "Popup/Status2@2x.png"; sourceTree = "<group>"; };
+		9608CC1C1ADC162700AB4ACB /* StatusOff@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "StatusOff@2x.png"; path = "Popup/StatusOff@2x.png"; sourceTree = "<group>"; };
+		9608CC1D1ADC162700AB4ACB /* StatusOn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "StatusOn@2x.png"; path = "Popup/StatusOn@2x.png"; sourceTree = "<group>"; };
 		995A4E4D631A43CC9C828C3A /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D624D9CFF600418DB66BF67D /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		DD4F7C0413C30F9F00825C6E /* Timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Timer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,8 +49,6 @@
 		DD4F7C4313C31BD200825C6E /* Panel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Panel.m; sourceTree = "<group>"; };
 		DD4F7C4513C3208500825C6E /* BackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundView.h; sourceTree = "<group>"; };
 		DD4F7C4613C3208500825C6E /* BackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundView.m; sourceTree = "<group>"; };
-		DD4F7C4913C322FA00825C6E /* Status.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Status.png; path = Popup/Status.png; sourceTree = "<group>"; };
-		DDF4EFAB16C80A510044D141 /* Status@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Status@2x.png"; path = "Popup/Status@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,10 +155,8 @@
 		DD4F7C4813C322D800825C6E /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
-				96EE05A71739142200844F9B /* Status2.png */,
-				96EE05A81739142200844F9B /* Status2@2x.png */,
-				DD4F7C4913C322FA00825C6E /* Status.png */,
-				DDF4EFAB16C80A510044D141 /* Status@2x.png */,
+				9608CC1C1ADC162700AB4ACB /* StatusOff@2x.png */,
+				9608CC1D1ADC162700AB4ACB /* StatusOn@2x.png */,
 			);
 			name = Graphics;
 			sourceTree = "<group>";
@@ -221,10 +215,8 @@
 			files = (
 				DD4F7C1F13C30F9F00825C6E /* MainMenu.xib in Resources */,
 				DD4F7C4113C31B4A00825C6E /* Panel.xib in Resources */,
-				DD4F7C4B13C322FA00825C6E /* Status.png in Resources */,
-				DDF4EFAC16C80A510044D141 /* Status@2x.png in Resources */,
-				96EE05A91739142200844F9B /* Status2.png in Resources */,
-				96EE05AA1739142200844F9B /* Status2@2x.png in Resources */,
+				9608CC1E1ADC162700AB4ACB /* StatusOff@2x.png in Resources */,
+				9608CC1F1ADC162700AB4ACB /* StatusOn@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

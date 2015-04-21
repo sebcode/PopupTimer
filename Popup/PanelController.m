@@ -280,7 +280,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)startTimer
 {
     timerLabel.textColor = [NSColor blackColor];
-    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:@"Status2"]];
+    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:@"StatusOn"]];
+    [appDelegate.menubarController.statusItemView setAlternateImage:[NSImage imageNamed:@"StatusOn"]];
     [startButton setTitle:@"Stop"];
     DDLogInfo(@"[%@] Timer start at %@", currentProject, [self formatTime]);
     timerStarted = YES;
@@ -289,7 +290,8 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 - (void)stopTimer
 {
     timerLabel.textColor = [NSColor grayColor];
-    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:@"Status"]];
+    [appDelegate.menubarController.statusItemView setImage:[NSImage imageNamed:@"StatusOff"]];
+    [appDelegate.menubarController.statusItemView setAlternateImage:[NSImage imageNamed:@"StatusOff"]];
     [startButton setTitle:@"Start"];
     DDLogInfo(@"[%@] Timer stop at %@", currentProject, [self formatTime]);
     timerStarted = NO;

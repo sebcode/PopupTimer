@@ -10,29 +10,29 @@
 	<string>Timer</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>BE90A809-2AB0-46EA-BE21-621CCBD800BD</key>
+		<key>C46AA6D8BE61BA4FE33F4E519917EC296B54830C</key>
 		<string>ssh://github.com/sebcode/Popup.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>Timer.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>BE90A809-2AB0-46EA-BE21-621CCBD800BD</key>
+		<key>C46AA6D8BE61BA4FE33F4E519917EC296B54830C</key>
 		<string>..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>ssh://github.com/sebcode/Popup.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>BE90A809-2AB0-46EA-BE21-621CCBD800BD</string>
+	<string>C46AA6D8BE61BA4FE33F4E519917EC296B54830C</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>BE90A809-2AB0-46EA-BE21-621CCBD800BD</string>
+			<string>C46AA6D8BE61BA4FE33F4E519917EC296B54830C</string>
 			<key>IDESourceControlWCCName</key>
 			<string>PopupTimer</string>
 		</dict>
