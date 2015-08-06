@@ -16,7 +16,7 @@
         NSStatusItem *statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:STATUS_ITEM_VIEW_WIDTH];
         _statusItemView = [[StatusItemView alloc] initWithStatusItem:statusItem];
         _statusItemView.image = [NSImage imageNamed:@"StatusOff"];
-        _statusItemView.alternateImage = [NSImage imageNamed:@"StatusHighlighted"];
+        _statusItemView.alternateImage = [NSImage imageNamed:@"StatusOff"];
         _statusItemView.action = @selector(togglePanel:);
     }
     return self;
